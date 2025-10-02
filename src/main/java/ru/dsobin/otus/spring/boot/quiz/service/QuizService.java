@@ -5,6 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import ru.dsobin.otus.spring.boot.quiz.model.Question;
+import ru.dsobin.otus.spring.boot.quiz.reader.QuestionReader;
 
 import java.util.List;
 import java.util.Scanner;
@@ -14,10 +15,10 @@ public class QuizService {
     @Value("${quiz.passing.score}")
     private int passingScore;
 
-    private final CsvQuestionService questionReader;
+    private final QuestionReader questionReader;
     private final MessageSource messageSource;
 
-    public QuizService(CsvQuestionService questionReader, MessageSource messageSource) {
+    public QuizService(QuestionReader questionReader, MessageSource messageSource) {
         this.questionReader = questionReader;
         this.messageSource = messageSource;
     }
