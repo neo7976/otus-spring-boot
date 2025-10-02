@@ -13,8 +13,8 @@ public class OtusSpringBootApplication {
 		SpringApplication.run(OtusSpringBootApplication.class, args);
 	}
 
-//	@Bean
-//	public CommandLineRunner runQuiz(QuizService quizService) {
-//		return args -> quizService.runQuiz();
-//	}
+	@Bean
+	public CommandLineRunner runQuiz(QuizService quizService) {
+		return args -> quizService.runQuiz();
+	}
 }

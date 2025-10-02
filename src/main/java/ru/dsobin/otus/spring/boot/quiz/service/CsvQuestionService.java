@@ -1,6 +1,7 @@
 package ru.dsobin.otus.spring.boot.quiz.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.dsobin.otus.spring.boot.quiz.model.Question;
@@ -18,7 +19,7 @@ public class CsvQuestionService implements QuestionReader {
 
     private final Resource questionsResource;
 
-    public CsvQuestionService(Resource questionsResource) {
+    public CsvQuestionService(@Qualifier("quizResource") Resource questionsResource) {
         this.questionsResource = questionsResource;
     }
 

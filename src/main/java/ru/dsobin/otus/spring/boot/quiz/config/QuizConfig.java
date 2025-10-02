@@ -9,7 +9,7 @@ import org.springframework.core.io.Resource;
 @Configuration
 public class QuizConfig {
 
-    @Bean
+    @Bean("quizResource")
     public Resource questionsResource(@Value("${quiz.questions.file}") String fileName) {
         return new ClassPathResource(fileName);
     }

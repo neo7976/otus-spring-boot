@@ -1,12 +1,10 @@
 package ru.dsobin.otus.spring.boot.quiz.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import ru.dsobin.otus.spring.boot.quiz.model.Question;
-import ru.dsobin.otus.spring.boot.quiz.reader.QuestionReader;
 
 import java.util.List;
 import java.util.Scanner;

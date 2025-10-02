@@ -28,8 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>11</java.version>
-		<lombok.version>1.18.30</lombok.version>
-
+		<lombok.version>1.18.18</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
