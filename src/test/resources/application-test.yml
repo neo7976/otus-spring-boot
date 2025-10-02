@@ -5,8 +5,6 @@ spring:
 
 quiz:
   questions:
-    file: questions.csv
+    file: questions-test.csv
   passing:
     score: 4
-server:
-  port: 9000

@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import ru.dsobin.otus.spring.boot.quiz.service.QuizService;
 
 @SpringBootApplication
@@ -14,6 +15,7 @@ public class OtusSpringBootApplication {
 	}
 
 	@Bean
+	@Profile("!test")
 	public CommandLineRunner runQuiz(QuizService quizService) {
 		return args -> quizService.runQuiz();
 	}
