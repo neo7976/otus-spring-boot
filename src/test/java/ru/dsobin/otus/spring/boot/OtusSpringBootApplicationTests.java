@@ -1,4 +1,4 @@
-package ru.dsobin.otus_spring_boot;
+package ru.dsobin.otus.spring.boot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
