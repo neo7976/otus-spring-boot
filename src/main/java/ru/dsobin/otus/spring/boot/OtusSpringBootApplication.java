@@ -1,4 +1,4 @@
-package ru.dsobin.otus_spring_boot;
+package ru.dsobin.otus.spring.boot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
