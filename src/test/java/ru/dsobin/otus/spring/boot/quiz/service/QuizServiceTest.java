@@ -2,6 +2,8 @@ package ru.dsobin.otus.spring.boot.quiz.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.dsobin.otus.spring.boot.quiz.model.Question;
 
@@ -39,7 +41,7 @@ class QuizServiceTest {
         var questionService = mock(QuestionService.class);
         when(questionService.getQuestions()).thenReturn(sampleQuestions());
 
-        var quizService = new QuizService(questionService);
+        var quizService = new QuizService(ms(), questionService);
         ReflectionTestUtils.setField(quizService, "passingScore", 2);
 
         // Answers: B (correct), C (wrong), any free text (treated as correct)
@@ -47,9 +49,9 @@ class QuizServiceTest {
         quizService.conductQuiz(io);
 
         String out = io.joinedOutput();
-        assertTrue(out.contains("Quiz finished!"));
-        assertTrue(out.contains("Correct answers: 2 out of 3"));
-        assertTrue(out.contains("Congratulations"));
+        assertTrue(out.contains("Quiz completed!") || out.contains("Викторина завершена!"));
+        assertTrue(out.contains("Correct answers: 2 out of 3") || out.contains("Правильных ответов: 2 из 3"));
+        assertTrue(out.contains("Congratulations") || out.contains("Поздравляем"));
     }
 
     @Test
@@ -58,7 +60,7 @@ class QuizServiceTest {
         var questionService = mock(QuestionService.class);
         when(questionService.getQuestions()).thenReturn(sampleQuestions());
 
-        var quizService = new QuizService(questionService);
+        var quizService = new QuizService(ms(), questionService);
         ReflectionTestUtils.setField(quizService, "passingScore", 2);
 
         // Answers: A (wrong), B (wrong for q2 since correct A), empty for free -> empty is incorrect for free
@@ -66,8 +68,20 @@ class QuizServiceTest {
         quizService.conductQuiz(io);
 
         String out = io.joinedOutput();
-        assertTrue(out.contains("Quiz finished!"));
-        assertTrue(out.contains("Correct answers: 0 out of 3") || out.contains("Correct answers: 1 out of 3"));
-        assertTrue(out.contains("did not pass"));
+        assertTrue(out.contains("Quiz completed!") || out.contains("Викторина завершена!"));
+        assertTrue(
+                out.contains("Correct answers: 0 out of 3") ||
+                out.contains("Correct answers: 1 out of 3") ||
+                out.contains("Правильных ответов: 0 из 3") ||
+                out.contains("Правильных ответов: 1 из 3")
+        );
+        assertTrue(out.contains("did not pass") || out.contains("К сожалению, вы не прошли"));
+    }
+
+    private MessageSource ms() {
+        ResourceBundleMessageSource ms = new ResourceBundleMessageSource();
+        ms.setBasename("messages");
+        ms.setDefaultEncoding("UTF-8");
+        return ms;
     }
 }

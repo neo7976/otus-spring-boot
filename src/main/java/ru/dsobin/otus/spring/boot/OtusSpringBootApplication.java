@@ -9,6 +9,4 @@ public class OtusSpringBootApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OtusSpringBootApplication.class, args);
 	}
-	//
-
 }
