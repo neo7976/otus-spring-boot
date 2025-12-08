@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import ru.dsobin.otus.spring.boot.dao.BookDao;
@@ -39,7 +38,7 @@ class BookDaoJdbcTest {
 
         // insert via raw SQL to avoid circular deps in test
         KeyHolder authorKey = new GeneratedKeyHolder();
-        new JdbcTemplate(((NamedParameterJdbcTemplate) bookDao).getJdbcTemplate().getDataSource())
+        jdbcTemplate
                 .update(conn -> {
                     PreparedStatement ps = conn.prepareStatement("INSERT INTO authors (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
                     ps.setString(1, author.getName());
@@ -48,7 +47,7 @@ class BookDaoJdbcTest {
         author.setId(authorKey.getKey().longValue());
 
         KeyHolder genreKey = new GeneratedKeyHolder();
-        new JdbcTemplate(((NamedParameterJdbcTemplate) bookDao).getJdbcTemplate().getDataSource())
+        jdbcTemplate
                 .update(conn -> {
                     PreparedStatement ps = conn.prepareStatement("INSERT INTO genres (name) VALUES (?)", Statement.RETURN_GENERATED_KEYS);
                     ps.setString(1, genre.getName());
