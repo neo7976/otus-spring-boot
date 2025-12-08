@@ -1,0 +1,9 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: otus-spring-boot
+  messages:
+    encoding: UTF-8
+    basename: messages
