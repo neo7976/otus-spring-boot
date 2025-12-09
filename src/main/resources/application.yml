@@ -1,14 +1,19 @@
 spring:
   application:
     name: otus-spring-boot
-  messages:
-    encoding: UTF-8
-    basename: messages
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
-    username: root
+    username: sa
     password: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
   h2:
     console:
       enabled: true
