@@ -75,7 +75,7 @@ public class BookShellCommands {
         var locale = LocaleContextHolder.getLocale();
         bookService.findById(id).ifPresentOrElse(book ->
                 {
-                    bookService.update(book, authorId, genreId);
+                    bookService.update(book, title, authorId, genreId);
                     io.print(messageSource.getMessage("book.update", null, locale));
                 },
                 () -> io.print(messageSource.getMessage("book.not.found.with.id", new Object[]{id}, locale)));

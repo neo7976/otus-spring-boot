@@ -10,7 +10,6 @@ import ru.dsobin.otus.spring.boot.repository.AuthorRepository;
 import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AuthorService {
 

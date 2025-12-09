@@ -11,7 +11,6 @@ import ru.dsobin.otus.spring.boot.repository.CommentRepository;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
@@ -22,6 +21,7 @@ public class CommentService {
         return commentRepository.findByBookId(bookId);
     }
 
+    @Transactional
     public Comment create(Long bookId, String text) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
@@ -31,6 +31,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    @Transactional
     public void update(Long id, String text) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
@@ -38,6 +39,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    @Transactional
     public void deleteById(Long id) {
         commentRepository.deleteById(id);
     }

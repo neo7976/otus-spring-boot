@@ -9,7 +9,6 @@ import ru.dsobin.otus.spring.boot.repository.AuthorRepository;
 import ru.dsobin.otus.spring.boot.repository.GenreRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class GenreService {
 
