@@ -16,17 +16,17 @@ public class CommentShellCommands {
     private final CommentService commentService;
     private final BookService bookService;
 
-    @ShellMethod(key = {"list-comments", "l-c"}, value = "List comments for book")
-    public void listComments(@ShellOption long bookId) {
-        bookService.findById(bookId).ifPresentOrElse(book -> {
-            List<Comment> comments = commentService.findByBookId(bookId);
-            if (comments.isEmpty()) {
-                System.out.println("No comments for book " + bookId);
-            } else {
-                comments.forEach(c -> System.out.println(c.getId() + ": " + c.getText()));
-            }
-        }, () -> System.out.println("Book not found"));
-    }
+//    @ShellMethod(key = {"list-comments", "l-c"}, value = "List comments for book")
+//    public void listComments(@ShellOption long bookId) {
+//        bookService.findById(bookId).ifPresentOrElse(book -> {
+//            List<Comment> comments = commentService.findByBookId(bookId);
+//            if (comments.isEmpty()) {
+//                System.out.println("No comments for book " + bookId);
+//            } else {
+//                comments.forEach(c -> System.out.println(c.getId() + ": " + c.getText()));
+//            }
+//        }, () -> System.out.println("Book not found"));
+//    }
 
     @ShellMethod(key = {"a-c", "add-comment"}, value = "Add comment to book")
     public void addComment(@ShellOption long bookId, @ShellOption String text) {

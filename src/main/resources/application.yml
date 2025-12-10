@@ -1,3 +1,5 @@
+
+
 spring:
   application:
     name: otus-spring-boot
@@ -20,3 +22,5 @@ spring:
   sql:
     init:
       mode: always
+server:
+  port: 9000
