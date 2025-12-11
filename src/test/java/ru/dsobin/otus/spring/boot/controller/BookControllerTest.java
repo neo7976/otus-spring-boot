@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false",
         ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false"
@@ -95,8 +97,16 @@ class BookControllerTest {
         Map<String, Object> valueMap = (Map<String, Object>) resultDto.getValue();
 
         String actualTitle = (String) valueMap.get("title");
-        Integer bookId = (Integer)valueMap.get("bookId");
+        Long bookId = ((Number) valueMap.get("bookId")).longValue();
         assertThat(actualTitle).isEqualTo(bookDto.getTitle());
+
+        Map<String, Object> authorMap = (Map<String, Object>) valueMap.get("author");
+        Long actualAuthorId = ((Number) authorMap.get("authorId")).longValue();
+        assertThat(actualAuthorId).isEqualTo(bookDto.getAuthor().getAuthorId());
+
+        Map<String, Object> genreMap = (Map<String, Object>) valueMap.get("genre");
+        Long actualGenreId = ((Number) genreMap.get("genreId")).longValue();
+        assertThat(actualGenreId).isEqualTo(bookDto.getGenre().getGenreId());
 
         BookDto bookUpdDto = BookData.testUpdDto();
         ResultDto resultUpdDto = createBook(bookUpdDto, MockMvcRequestBuilders
@@ -109,6 +119,14 @@ class BookControllerTest {
 
         String updTitle = (String) valueMapUpd.get("title");
         assertThat(updTitle).isEqualTo(bookUpdDto.getTitle());
+
+        Map<String, Object> updAuthorMap = (Map<String, Object>) valueMapUpd.get("author");
+        Long updAuthorId = ((Number) updAuthorMap.get("authorId")).longValue();
+        assertThat(updAuthorId).isEqualTo(bookUpdDto.getAuthor().getAuthorId());
+
+        Map<String, Object> updGenreMap = (Map<String, Object>) valueMapUpd.get("genre");
+        Long updGenreId = ((Number) updGenreMap.get("genreId")).longValue();
+        assertThat(updGenreId).isEqualTo(bookUpdDto.getGenre().getGenreId());
     }
 
     private ResultDto createBook(BookDto bookDto, MockHttpServletRequestBuilder bookUrl) throws Exception {
