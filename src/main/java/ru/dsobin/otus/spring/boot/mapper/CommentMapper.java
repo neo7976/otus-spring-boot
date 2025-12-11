@@ -13,10 +13,12 @@ public class CommentMapper {
     public static CommentDto toDto(Comment comment) {
         if (comment == null) return null;
         UserDto userDto = UserMapper.toDto(comment.getUser());
+
         return CommentDto.builder()
                 .commentId(comment.getId())
                 .text(comment.getText())
                 .user(userDto)
+                .createAt(comment.getCreateAt().toString())
                 .build();
     }
 

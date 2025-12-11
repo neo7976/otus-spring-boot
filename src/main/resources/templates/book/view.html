@@ -3,37 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Книга</title>
-    <style>
-        body { font-family: Arial; margin: 20px; }
-        textarea { width: 100%; height: 80px; margin: 10px 0; }
-        button { padding: 8px 16px; }
-        .comments { margin-top: 20px; }
-        .comment { border-left: 3px solid #007BFF; padding-left: 10px; margin: 10px 0; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 </head>
 <body>
 
-<h1>Добавить комментарий к книге</h1>
-<p>Книга ID: <span th:text="${bookId}"></span></p>
+<div class="container">
 
-<form id="commentForm">
-    <textarea id="commentText" placeholder="Ваш комментарий..." required></textarea>
-    <button type="submit">Отправить</button>
-</form>
+    <h1>💬 Добавить комментарий</h1>
+    <p class="book-id">Книга ID: <strong th:text="${bookId}">1</strong></p>
 
-<div id="message"></div>
-
-<div class="comments">
-    <h2>Комментарии</h2>
-    <div id="commentsList">
-        <!-- Комментарии будут подгружены позже -->
+    <div class="form-card">
+        <form id="commentForm">
+            <div class="form-group">
+                <label for="commentText">Ваш комментарий:</label>
+                <textarea id="commentText" placeholder="Напишите свой отзыв..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить комментарий</button>
+        </form>
     </div>
+
+    <div id="message" class="message-box"></div>
+
+    <div class="comments-section">
+        <h2>Комментарии (<span id="commentsCount">0</span>)</h2>
+        <div id="commentsList" class="comments-list">
+            <!-- Комментарии подгрузятся сюда -->
+        </div>
+    </div>
+
+    <a href="/book/list" class="back-link">← Назад к списку</a>
+
 </div>
 
-<a href="/book/list">← Назад к списку</a>
+<script th:inline="javascript">
+    // Thymeleaf подставит bookId
+    const bookId = /*[[${bookId}]]*/ 0;
+    console.log("Book ID:", bookId); // для отладки
 
-<script>
-    const bookId = /*[[${bookId}]]*/ 1;
+    if (!bookId || bookId <= 0) {
+        document.getElementById('message').className = 'message-box error';
+        document.getElementById('message').textContent = 'Ошибка: не указан ID книги';
+    }
 
     document.getElementById('commentForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -43,6 +53,7 @@
         const csrfToken = getCookie('XSRF-TOKEN');
 
         try {
+            // 🔥 ИСПРАВЛЕНО: правильный URL
             const response = await fetch(`/comment/api/v1/add-comment/${bookId}`, {
                 method: 'POST',
                 headers: {
@@ -53,20 +64,21 @@
             });
 
             const result = await response.json();
-
             const messageDiv = document.getElementById('message');
+
             if (response.ok && result.success) {
-                messageDiv.className = 'success';
-                messageDiv.textContent = 'Комментарий добавлен!';
+                messageDiv.className = 'message-box success';
+                messageDiv.textContent = '✅ Комментарий успешно добавлен!';
                 document.getElementById('commentText').value = '';
                 loadComments(); // обновить список
             } else {
-                messageDiv.className = 'error';
-                messageDiv.textContent = 'Ошибка: ' + (result.msg || 'неизвестно');
+                messageDiv.className = 'message-box error';
+                messageDiv.textContent = '❌ Ошибка: ' + (result.msg || 'не удалось добавить комментарий');
             }
         } catch (err) {
             console.error(err);
-            document.getElementById('message').textContent = 'Ошибка сети';
+            document.getElementById('message').className = 'message-box error';
+            document.getElementById('message').textContent = '❌ Ошибка сети: ' + err.message;
         }
     });
 
@@ -76,10 +88,69 @@
         return p.length === 2 ? p.pop().split(";").shift() : null;
     }
 
-    // Опционально: загрузка комментариев
-    function loadComments() {
-        // Можно реализовать GET /book/api/v1/{id} и отобразить комментарии
+    // Загрузка комментариев
+    async function loadComments() {
+        try {
+            const response = await fetch(`/book/api/v1/${bookId}`);
+            if (!response.ok) throw new Error('Не удалось загрузить книгу');
+
+            const result = await response.json();
+            if (!result.success) throw new Error('Ошибка сервера');
+
+            const book = result.value;
+            const comments = book.comments || [];
+
+            const list = document.getElementById('commentsList');
+            const count = document.getElementById('commentsCount');
+            count.textContent = comments.length;
+
+            if (comments.length === 0) {
+                list.innerHTML = '<p class="no-comments">Пока нет комментариев.</p>';
+                return;
+            }
+
+            let html = '<ul class="comment-items">';
+            comments.forEach(comment => {
+                const text = escapeHtml(comment.text || '');
+                const username = escapeHtml(comment.user?.username || 'Аноним');
+                const createAt = comment.createAt
+                    ? new Date(comment.createAt).toLocaleString('ru-RU')
+                    : '—';
+
+                html += `
+                    <li class="comment-item">
+                        <div class="comment-header">
+                            <strong>${username}</strong> — <small>${createAt}</small>
+                        </div>
+                        <p class="comment-text">${text}</p>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            list.innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            document.getElementById('commentsList').innerHTML = `<div class="error-message">Не удалось загрузить комментарии</div>`;
+        }
     }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Загружаем комментарии при старте
+    document.addEventListener('DOMContentLoaded', () => {
+        if (bookId > 0) {
+            loadComments();
+        }
+    });
 </script>
 
 </body>
