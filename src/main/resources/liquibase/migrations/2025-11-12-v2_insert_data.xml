@@ -1,0 +1,98 @@
+<!-- src/main/resources/db/changelog/changes/v2_insert_data.xml -->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.21.xsd">
+
+    <changeSet id="2025-11-12-v2-insert-data" author="Dmitrii Sobin">
+
+        <!-- Авторы -->
+        <insert tableName="authors">
+            <column name="name" value="Лев Толстой"/>
+        </insert>
+        <insert tableName="authors">
+            <column name="name" value="Фёдор Достоевский"/>
+        </insert>
+
+        <!-- Жанры -->
+        <insert tableName="genres">
+            <column name="name" value="Роман"/>
+        </insert>
+        <insert tableName="genres">
+            <column name="name" value="Психологический роман"/>
+        </insert>
+
+        <!-- Книги -->
+        <insert tableName="books">
+            <column name="title" value="Война и мир"/>
+            <column name="author_id" valueNumeric="1"/>
+            <column name="genre_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="books">
+            <column name="title" value="Анна Каренина"/>
+            <column name="author_id" valueNumeric="1"/>
+            <column name="genre_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="books">
+            <column name="title" value="Преступление и наказание"/>
+            <column name="author_id" valueNumeric="2"/>
+            <column name="genre_id" valueNumeric="2"/>
+        </insert>
+
+        <!-- Комментарии -->
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="1"/>
+            <column name="text" value="Одно из величайших произведений мировой литературы."/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="1"/>
+            <column name="text" value="Очень длинная, но глубокая книга."/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="2"/>
+            <column name="text" value="Трагическая история любви и долга."/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="3"/>
+            <column name="text" value="Потрясающий психологический портрет преступника."/>
+        </insert>
+
+        <!-- Роли -->
+        <insert tableName="user_role">
+            <column name="name" value="ROLE_USER"/>
+<!--            <column name="last_update" valueComputed="NOW()"/>-->
+        </insert>
+        <insert tableName="user_role">
+            <column name="name" value="ROLE_ADMIN"/>
+<!--            <column name="last_update" valueComputed="NOW()"/>-->
+        </insert>
+
+        <!-- Пользователи -->
+        <!-- Пароли хешируются через BCrypt -->
+
+        <!-- user / password -->
+        <insert tableName="users">
+            <column name="username" value="user"/>
+            <column name="password" value="$2a$10$PgSKSyUo.189qBD/NViBG.hNyPFKv6/jTjNsS0FDGybmjLhd/DnFy"/>
+        </insert>
+
+        <!-- admin / password -->
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$PgSKSyUo.189qBD/NViBG.hNyPFKv6/jTjNsS0FDGybmjLhd/DnFy"/>
+        </insert>
+
+        <!-- Связи пользователей и ролей -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="1"/> <!-- user → ROLE_USER -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="2"/>
+            <column name="role_id" valueNumeric="2"/> <!-- admin → ROLE_ADMIN -->
+        </insert>
+
+    </changeSet>
+
+</databaseChangeLog>
