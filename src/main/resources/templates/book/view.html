@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Книга</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        textarea { width: 100%; height: 80px; margin: 10px 0; }
+        button { padding: 8px 16px; }
+        .comments { margin-top: 20px; }
+        .comment { border-left: 3px solid #007BFF; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<h1>Добавить комментарий к книге</h1>
+<p>Книга ID: <span th:text="${bookId}"></span></p>
+
+<form id="commentForm">
+    <textarea id="commentText" placeholder="Ваш комментарий..." required></textarea>
+    <button type="submit">Отправить</button>
+</form>
+
+<div id="message"></div>
+
+<div class="comments">
+    <h2>Комментарии</h2>
+    <div id="commentsList">
+        <!-- Комментарии будут подгружены позже -->
+    </div>
+</div>
+
+<a href="/book/list">← Назад к списку</a>
+
+<script>
+    const bookId = /*[[${bookId}]]*/ 1;
+
+    document.getElementById('commentForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = document.getElementById('commentText').value.trim();
+        if (!text) return;
+
+        const csrfToken = getCookie('XSRF-TOKEN');
+
+        try {
+            const response = await fetch(`/comment/api/v1/add-comment/${bookId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ text })
+            });
+
+            const result = await response.json();
+
+            const messageDiv = document.getElementById('message');
+            if (response.ok && result.success) {
+                messageDiv.className = 'success';
+                messageDiv.textContent = 'Комментарий добавлен!';
+                document.getElementById('commentText').value = '';
+                loadComments(); // обновить список
+            } else {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Ошибка: ' + (result.msg || 'неизвестно');
+            }
+        } catch (err) {
+            console.error(err);
+            document.getElementById('message').textContent = 'Ошибка сети';
+        }
+    });
+
+    function getCookie(name) {
+        let v = "; " + document.cookie;
+        let p = v.split("; " + name + "=");
+        return p.length === 2 ? p.pop().split(";").shift() : null;
+    }
+
+    // Опционально: загрузка комментариев
+    function loadComments() {
+        // Можно реализовать GET /book/api/v1/{id} и отобразить комментарии
+    }
+</script>
+
+</body>
+</html>

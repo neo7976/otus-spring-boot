@@ -25,6 +25,10 @@
     <!-- Добавьте другие ссылки по мере реализации -->
 </div>
 
+<div class="nav" sec:authorize="hasRole('ADMIN')">
+    <a href="/book/create">➕ Добавить книгу</a>
+</div>
+
 <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 </form>

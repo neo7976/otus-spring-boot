@@ -28,15 +28,15 @@ public class CommentShellCommands {
 //        }, () -> System.out.println("Book not found"));
 //    }
 
-    @ShellMethod(key = {"a-c", "add-comment"}, value = "Add comment to book")
-    public void addComment(@ShellOption long bookId, @ShellOption String text) {
-        try {
-            Comment comment = commentService.create(bookId, text);
-            System.out.println("Comment added with ID: " + comment.getId());
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
+//    @ShellMethod(key = {"a-c", "add-comment"}, value = "Add comment to book")
+//    public void addComment(@ShellOption long bookId, @ShellOption String text) {
+//        try {
+//            Comment comment = commentService.create(bookId, text);
+//            System.out.println("Comment added with ID: " + comment.getId());
+//        } catch (Exception e) {
+//            System.out.println("Error: " + e.getMessage());
+//        }
+//    }
 
     @ShellMethod(key = {"u-c", "update-comment", "upd-comment"}, value = "Update comment")
     public void updateComment(@ShellOption long id, @ShellOption String text) {

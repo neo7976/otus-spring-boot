@@ -1,6 +1,7 @@
 package ru.dsobin.otus.spring.boot.mapper;
 
 import ru.dsobin.otus.spring.boot.dto.CommentDto;
+import ru.dsobin.otus.spring.boot.dto.UserDto;
 import ru.dsobin.otus.spring.boot.model.Comment;
 
 import java.util.Collections;
@@ -11,9 +12,11 @@ public class CommentMapper {
 
     public static CommentDto toDto(Comment comment) {
         if (comment == null) return null;
+        UserDto userDto = UserMapper.toDto(comment.getUser());
         return CommentDto.builder()
                 .commentId(comment.getId())
                 .text(comment.getText())
+                .user(userDto)
                 .build();
     }
 

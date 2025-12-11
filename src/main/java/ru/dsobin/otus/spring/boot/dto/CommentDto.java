@@ -23,4 +23,5 @@ import javax.persistence.ManyToOne;
 public class CommentDto {
     private Long commentId;
     private String text;
+    private UserDto user;
 }

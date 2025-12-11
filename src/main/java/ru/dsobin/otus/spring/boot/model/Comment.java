@@ -13,7 +13,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -32,4 +34,16 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createAt = LocalDateTime.now();
+    }
 }

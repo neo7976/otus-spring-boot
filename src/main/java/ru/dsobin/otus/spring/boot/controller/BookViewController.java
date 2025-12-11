@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.dsobin.otus.spring.boot.dto.AuthorDto;
+import ru.dsobin.otus.spring.boot.dto.BookDto;
 import ru.dsobin.otus.spring.boot.dto.GenreDto;
 import ru.dsobin.otus.spring.boot.service.AuthorService;
 import ru.dsobin.otus.spring.boot.service.GenreService;
@@ -29,5 +31,19 @@ public class BookViewController {
         model.addAttribute("genres", genres);
 
         return "book/list";
+    }
+
+    @GetMapping("/book/create")
+    public String createBookPage(Model model) {
+        model.addAttribute("authors", authorService.findAll());
+        model.addAttribute("genres", genreService.findAll());
+        model.addAttribute("book", new BookDto());
+        return "book/create";
+    }
+
+    @GetMapping("/book/view/{id}")
+    public String viewBook(@PathVariable("id") Long id, Model model) {
+        model.addAttribute("bookId", id);
+        return "book/view";
     }
 }

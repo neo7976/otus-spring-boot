@@ -40,23 +40,6 @@
             <column name="genre_id" valueNumeric="2"/>
         </insert>
 
-        <!-- Комментарии -->
-        <insert tableName="comments">
-            <column name="book_id" valueNumeric="1"/>
-            <column name="text" value="Одно из величайших произведений мировой литературы."/>
-        </insert>
-        <insert tableName="comments">
-            <column name="book_id" valueNumeric="1"/>
-            <column name="text" value="Очень длинная, но глубокая книга."/>
-        </insert>
-        <insert tableName="comments">
-            <column name="book_id" valueNumeric="2"/>
-            <column name="text" value="Трагическая история любви и долга."/>
-        </insert>
-        <insert tableName="comments">
-            <column name="book_id" valueNumeric="3"/>
-            <column name="text" value="Потрясающий психологический портрет преступника."/>
-        </insert>
 
         <!-- Роли -->
         <insert tableName="user_role">
@@ -82,6 +65,34 @@
             <column name="username" value="admin"/>
             <column name="password" value="$2a$10$PgSKSyUo.189qBD/NViBG.hNyPFKv6/jTjNsS0FDGybmjLhd/DnFy"/>
         </insert>
+
+
+        <!-- Комментарии -->
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="1"/>
+            <column name="user_id" valueNumeric="1"/>
+            <column name="text" value="Одно из величайших произведений мировой литературы."/>
+            <column name="create_at" valueComputed="NOW()"/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="1"/>
+            <column name="user_id" valueNumeric="2"/>
+            <column name="text" value="Очень длинная, но глубокая книга."/>
+            <column name="create_at" valueComputed="NOW()"/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="2"/>
+            <column name="user_id" valueNumeric="1"/>
+            <column name="text" value="Трагическая история любви и долга."/>
+            <column name="create_at" valueComputed="NOW()"/>
+        </insert>
+        <insert tableName="comments">
+            <column name="book_id" valueNumeric="3"/>
+            <column name="user_id" valueNumeric="2"/>
+            <column name="text" value="Потрясающий психологический портрет преступника."/>
+            <column name="create_at" valueComputed="NOW()"/>
+        </insert>
+
 
         <!-- Связи пользователей и ролей -->
         <insert tableName="user_roles">

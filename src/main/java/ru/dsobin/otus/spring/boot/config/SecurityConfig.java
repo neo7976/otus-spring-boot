@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import ru.dsobin.otus.spring.boot.service.CustomUserDetailsService;
 
 @Configuration
@@ -34,18 +35,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // для куки
+                .and()
                 .authorizeRequests()
-                .antMatchers("/login", "/css/**", "/js/**", "/webjars/**").permitAll()
-                .antMatchers("/", "/book/list").authenticated() // защищены
+                .antMatchers("/login", "/css/**", "/js/**").permitAll()
+                .antMatchers("/book/view/**").authenticated()
+                .antMatchers("/book/create").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true) // redirect на главную
+                .defaultSuccessUrl("/", true)
                 .permitAll()
                 .and()
                 .logout()
-                .logoutSuccessUrl("/login?logout")
                 .permitAll();
     }
 }

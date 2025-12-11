@@ -64,8 +64,15 @@
             <column name="book_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
 
+        <!-- Внешний ключ на книгу -->
         <addForeignKeyConstraint
                 baseTableName="comments"
                 baseColumnNames="book_id"
@@ -87,6 +94,16 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+
+
+        <!-- Внешний ключ на пользователя -->
+        <addForeignKeyConstraint
+                baseTableName="comments"
+                baseColumnNames="user_id"
+                constraintName="fk_comments_users"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                onDelete="CASCADE"/>
 
         <createTable tableName="user_role">
             <column name="id" type="BIGINT" autoIncrement="true">
