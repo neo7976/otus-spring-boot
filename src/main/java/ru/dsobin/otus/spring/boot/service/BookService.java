@@ -1,6 +1,8 @@
 package ru.dsobin.otus.spring.boot.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +21,8 @@ import ru.dsobin.otus.spring.boot.utils.PageDataUtil;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +31,8 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorService authorService;
     private final GenreService genreService;
+    private final MessageSource messageSource;
+    private static final Locale locale = LocaleContextHolder.getLocale();
 
     @Transactional(readOnly = true)
     public PageDataDto<BookDto> findAll(BookPageInfoDto infoDto) {
@@ -44,8 +50,12 @@ public class BookService {
     public BookDto findById(Long id) {
         return bookRepository.findById(id)
                 .map(BookMapper::toDto)
-                .orElseThrow(()-> new EntityNotFoundException("Не найдена книга с ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage(
+                        "book.not.found.with.id",
+                        new Object[]{id},
+                        locale)));
     }
+
 
     @Transactional
     public Book create(String title, Long authorId, Long genreId) {
@@ -61,6 +71,20 @@ public class BookService {
     }
 
     @Transactional
+    public BookDto create(BookDto dto) {
+        Author author = authorService.findById(dto.getAuthor().getAuthorId());
+        Genre genre = genreService.findById(dto.getGenre().getGenreId());
+        Book book = BookMapper.toEntity(dto, author, genre);
+
+        return Optional.of(bookRepository.save(book))
+                .map(BookMapper::toDto)
+                .orElseThrow(() -> new RuntimeException(messageSource.getMessage(
+                        "book.not.create",
+                        null,
+                        locale)));
+    }
+
+    @Transactional
     public Book update(Book book, String title, Long authorId, Long genreId) {
         Author author = authorService.findById(authorId);
         Genre genre = genreService.findById(genreId);
@@ -71,7 +95,27 @@ public class BookService {
     }
 
     @Transactional
-    public void deleteById(Long id) {
+    public BookDto update(Long bookId, BookDto dto) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException(messageSource.getMessage(
+                        "book.not.found.with.id",
+                        new Object[]{bookId},
+                        locale)));
+        Author author = authorService.findById(dto.getAuthor().getAuthorId());
+        Genre genre = genreService.findById(dto.getGenre().getGenreId());
+
+        BookMapper.updateEntity(book, dto, author, genre);
+        return Optional.of(bookRepository.save(book))
+                .map(BookMapper::toDto)
+                .orElseThrow(() -> new RuntimeException(messageSource.getMessage(
+                        "book.not.update",
+                        null,
+                        locale)));
+    }
+
+    @Transactional
+    public boolean deleteById(Long id) {
         bookRepository.deleteById(id);
+        return !bookRepository.existsById(id);
     }
 }

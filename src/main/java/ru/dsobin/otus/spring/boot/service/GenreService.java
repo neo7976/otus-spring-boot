@@ -8,6 +8,8 @@ import ru.dsobin.otus.spring.boot.model.Genre;
 import ru.dsobin.otus.spring.boot.repository.AuthorRepository;
 import ru.dsobin.otus.spring.boot.repository.GenreRepository;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 public class GenreService {
@@ -16,6 +18,6 @@ public class GenreService {
 
     @Transactional(readOnly = true)
     public Genre findById(Long id) {
-        return genreRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Genre not found"));
+        return genreRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
     }
 }

@@ -15,4 +15,8 @@ public class AuthorDto {
 
     private Long authorId;
     private String name;
+
+    public AuthorDto(Long authorId) {
+        this.authorId = authorId;
+    }
 }

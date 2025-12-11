@@ -7,6 +7,7 @@ import ru.dsobin.otus.spring.boot.model.Author;
 import ru.dsobin.otus.spring.boot.model.Book;
 import ru.dsobin.otus.spring.boot.repository.AuthorRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,6 @@ public class AuthorService {
 
     @Transactional(readOnly = true)
     public Author findById(Long id) {
-        return authorRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Author not found"));
+        return authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Author not found"));
     }
 }

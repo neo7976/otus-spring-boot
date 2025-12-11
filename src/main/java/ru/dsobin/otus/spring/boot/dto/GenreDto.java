@@ -16,4 +16,8 @@ public class GenreDto {
     private Long genreId;
 
     private String name;
+
+    public GenreDto(Long genreId) {
+        this.genreId = genreId;
+    }
 }
