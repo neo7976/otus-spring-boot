@@ -2,14 +2,162 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Книги</title>
+    <title>Список книг</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        form div { margin: 10px 0; }
+        input, select, button { padding: 6px; margin-right: 10px; }
+        .error { color: red; margin-top: 10px; }
+        .loading { color: #007BFF; }
+    </style>
 </head>
 <body>
-<h1>Список книг</h1>
-<p>Здесь будет список книг (пока заглушка).</p>
 
-<!-- Позже вы сможете итерироваться по model.addAttribute("books", ...) -->
+<h1>Список книг</h1>
+
+<!-- Форма фильтрации -->
+<form id="filterForm">
+    <div>
+        <label>Название:</label>
+        <input type="text" id="title" name="title" />
+    </div>
+    <div>
+        <label>Автор:</label>
+        <select id="authorId" name="authorId">
+            <option value="">Все авторы</option>
+            <option th:each="author : ${authors}"
+                    th:value="${author.authorId}"
+                    th:text="${author.name}">Автор</option>
+        </select>
+    </div>
+    <div>
+        <label>Жанр:</label>
+        <select id="genreId" name="genreId">
+            <option value="">Все жанры</option>
+            <option th:each="genre : ${genres}"
+                    th:value="${genre.genreId}"
+                    th:text="${genre.name}">Жанр</option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Поиск</button>
+        <button type="button" onclick="resetForm()">Сбросить</button>
+    </div>
+</form>
+
+<div id="loading" class="loading" style="display:none;">Загрузка...</div>
+<div id="error" class="error"></div>
+
+<!-- Таблица книг -->
+<table id="booksTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Автор</th>
+        <th>Жанр</th>
+    </tr>
+    </thead>
+    <tbody id="booksBody">
+    <!-- Сюда подгружаем данные -->
+    </tbody>
+</table>
 
 <a href="/">← Назад на главную</a>
+
+<script>
+    const form = document.getElementById('filterForm');
+    const booksBody = document.getElementById('booksBody');
+    const loading = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+
+    // Загружаем книги при старте
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchBooks();
+    });
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        fetchBooks();
+    });
+
+    function resetForm() {
+        form.reset();
+        fetchBooks();
+    }
+
+    function fetchBooks() {
+        // Собираем параметры
+        const params = new URLSearchParams();
+        const title = document.getElementById('title').value;
+        const authorId = document.getElementById('authorId').value;
+        const genreId = document.getElementById('genreId').value;
+
+        if (title) params.append('title', title);
+        if (authorId) params.append('authorId', authorId);
+        if (genreId) params.append('genreId', genreId);
+
+        // Стандартные параметры пагинации и сортировки
+        params.append('sortBy', 'id');
+        params.append('orderBy', 'asc');
+        params.append('pageNumber', '0');
+        params.append('pageSize', '100'); // или меньше, если нужна пагинация
+
+        const url = `/book/api/v1?${params.toString()}`;
+
+        loading.style.display = 'block';
+        errorDiv.textContent = '';
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка запроса');
+                return response.json();
+            })
+            .then(data => {
+                renderBooks(data.data || []);
+            })
+            .catch(err => {
+                console.error(err);
+                errorDiv.textContent = 'Не удалось загрузить книги: ' + err.message;
+            })
+            .finally(() => {
+                loading.style.display = 'none';
+            });
+    }
+
+    function renderBooks(books) {
+        booksBody.innerHTML = '';
+        if (books.length === 0) {
+            booksBody.innerHTML = '<tr><td colspan="4">Книги не найдены</td></tr>';
+            return;
+        }
+
+        books.forEach(book => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${book.bookId || ''}</td>
+                <td>${escapeHtml(book.title || '')}</td>
+                <td>${escapeHtml(book.author?.name || '')}</td>
+                <td>${escapeHtml(book.genre?.name || '')}</td>
+            `;
+            booksBody.appendChild(row);
+        });
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+</script>
+
 </body>
 </html>
