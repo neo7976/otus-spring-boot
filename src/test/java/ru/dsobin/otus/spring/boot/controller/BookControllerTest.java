@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -53,8 +54,8 @@ class BookControllerTest {
     @Test
     @DisplayName("Поиск книги по ID")
     void findById() throws Exception {
-        String responseBody = mvc.perform(MockMvcRequestBuilders
-                        .get(bookUrl + "/1"))
+        String responseBody = mvc.perform(withAdmin(MockMvcRequestBuilders
+                        .get(bookUrl + "/1")))
 //                        .header(HttpHeaders.AUTHORIZATION, jwtPrefix + adminToken)
 //                        .param("user_id", "7"))
                 .andExpect(status().is2xxSuccessful())
@@ -71,9 +72,9 @@ class BookControllerTest {
     @Test
     @DisplayName("Поиск книги по ID. Ошибка")
     void notFoundById() throws Exception {
-        String responseBody = mvc.perform(MockMvcRequestBuilders
-                        .get(bookUrl + "/9999"))
-                .andExpect(status().is4xxClientError())
+        String responseBody = mvc.perform(withAdmin(MockMvcRequestBuilders
+                        .get(bookUrl + "/9999")))
+                .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
         System.out.println(responseBody);
@@ -82,6 +83,16 @@ class BookControllerTest {
         assertThat(resultDto).isNotNull();
         assertThat(resultDto.isSuccess()).isFalse();
         assertThat(resultDto.getValue()).isNull();
+    }
+
+    @Test
+    @DisplayName("Поиск книги по ID. Без авторизации блок")
+    void redirectFindById() throws Exception {
+        mvc.perform(MockMvcRequestBuilders
+                        .get(bookUrl + "/9999"))
+                .andExpect(status().is3xxRedirection())
+                .andReturn()
+                .getResponse().getContentAsString(Charset.defaultCharset());
     }
 
     @Test
@@ -132,9 +143,10 @@ class BookControllerTest {
     private ResultDto createBook(BookDto bookDto, MockHttpServletRequestBuilder bookUrl) throws Exception {
         String requestBodyCreate = JsonHelperUtils.getStringFromObject(bookDto);
 
-        String responseBodyCreate = mvc.perform(bookUrl
+        String responseBodyCreate = mvc.perform(withAdmin(bookUrl
                         .content(requestBodyCreate)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .with(user("admin").roles("ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON)))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
@@ -146,8 +158,8 @@ class BookControllerTest {
     @Test
     @DisplayName("Поиск всех книги")
     void findAll() throws Exception {
-        String responseBody = mvc.perform(MockMvcRequestBuilders
-                        .get(bookUrl + ""))
+        String responseBody = mvc.perform(withAdmin(MockMvcRequestBuilders
+                        .get(bookUrl + "")))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
@@ -162,8 +174,8 @@ class BookControllerTest {
     @Test
     @DisplayName("Удалить книгу по ID")
     void deleteById() throws Exception {
-        String responseBody = mvc.perform(MockMvcRequestBuilders
-                        .delete(bookUrl + "/1"))
+        String responseBody = mvc.perform(withAdmin(MockMvcRequestBuilders
+                        .delete(bookUrl + "/1")))
                 .andExpect(status().is2xxSuccessful())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
@@ -178,9 +190,9 @@ class BookControllerTest {
     @Test
     @DisplayName("Удалить книгу по ID. Ошибка")
     void notDeleteById() throws Exception {
-        String responseBody = mvc.perform(MockMvcRequestBuilders
-                        .delete(bookUrl + "/9999"))
-                .andExpect(status().is4xxClientError())
+        String responseBody = mvc.perform(withAdmin(MockMvcRequestBuilders
+                        .delete(bookUrl + "/9999")))
+                .andExpect(status().isBadRequest())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
         System.out.println(responseBody);
@@ -189,5 +201,9 @@ class BookControllerTest {
         assertThat(resultDto).isNotNull();
         assertThat(resultDto.isSuccess()).isFalse();
         assertThat(resultDto.getValue()).isNull();
+    }
+
+    private MockHttpServletRequestBuilder withAdmin(MockHttpServletRequestBuilder builder) {
+        return builder.with(user("admin").roles("ADMIN"));
     }
 }
