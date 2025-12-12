@@ -90,7 +90,7 @@ class BookControllerTest {
     void redirectFindById() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                         .get(bookUrl + "/9999"))
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().isForbidden())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
     }

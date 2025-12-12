@@ -24,3 +24,7 @@ spring:
 #      mode: always
 server:
   port: 9000
+
+jwt:
+  app_name: BOOK-SERVICE
+  jwt_secret: 77b473c7e99419be84718b0727a69b4310fc07deba68bad8ea7be17e5ef88ef9asdfghj8756432qwrefdsgd

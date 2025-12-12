@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.dsobin.otus.spring.boot.config.jwt.JWTUtil;
 import ru.dsobin.otus.spring.boot.model.User;
 import ru.dsobin.otus.spring.boot.repository.UserRepository;
 
