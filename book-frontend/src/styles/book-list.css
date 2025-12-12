@@ -206,7 +206,7 @@ h1 {
 
 /* Модальное окно */
 .modal {
-    display: none;
+    display: flex;
     position: fixed;
     z-index: 1000;
     left: 0;

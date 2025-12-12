@@ -16,8 +16,8 @@ export default function CreateBook() {
         const loadData = async () => {
             try {
                 const [authorRes, genreRes] = await Promise.all([
-                    api.get('/api/authors'),   // ← вам нужно добавить эти эндпоинты в бэкенд
-                    api.get('/api/genres')
+                    api.get('/author/api/v1'),   // ← вам нужно добавить эти эндпоинты в бэкенд
+                    api.get('/genre/api/v1')
                 ]);
                 setAuthors(authorRes.data);
                 setGenres(genreRes.data);

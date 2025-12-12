@@ -51,7 +51,7 @@ export default function BookView() {
 
             <div className="form-card">
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
+                    <div className="form-group comments-section">
                         <label htmlFor="commentText">Ваш комментарий:</label>
                         <textarea
                             id="commentText"
