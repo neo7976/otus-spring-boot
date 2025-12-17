@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(of = "commentId")
-public class CommentDto {
-    private Long commentId;
-    private String text;
-    private String createAt;
+@EqualsAndHashCode(of = "userId")
+public class UserDto {
+    private Long userId;
+    private String username;
 }

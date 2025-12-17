@@ -11,9 +11,11 @@ public class CommentMapper {
 
     public static CommentDto toDto(Comment comment) {
         if (comment == null) return null;
+
         return CommentDto.builder()
                 .commentId(comment.getId())
                 .text(comment.getText())
+                .createAt(null)
                 .build();
     }
 
