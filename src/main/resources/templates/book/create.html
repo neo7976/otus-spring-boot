@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить книгу</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>📖 Добавить новую книгу</h1>
+
+    <div id="message" class="message-box"></div>
+
+    <div class="form-card">
+        <form id="bookForm">
+            <div class="form-group">
+                <label for="title">Название книги:</label>
+                <input type="text" id="title" name="title" required placeholder="Введите название" />
+            </div>
+
+            <div class="form-group">
+                <label for="authorId">Автор:</label>
+                <select id="authorId" name="authorId" required>
+                    <option value="">-- Выберите автора --</option>
+                    <option th:each="author : ${authors}"
+                            th:value="${author.authorId}"
+                            th:text="${author.name}">Автор</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="genreId">Жанр:</label>
+                <select id="genreId" name="genreId" required>
+                    <option value="">-- Выберите жанр --</option>
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre.genreId}"
+                            th:text="${genre.name}">Жанр</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✅ Создать книгу</button>
+                <a href="/book/list" class="btn btn-secondary">← Назад к списку</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    document.getElementById('bookForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const title = document.getElementById('title').value;
+        const authorId = document.getElementById('authorId').value;
+        const genreId = document.getElementById('genreId').value;
+
+        const bookDto = {
+            title: title,
+            author: { authorId: parseInt(authorId) },
+            genre: { genreId: parseInt(genreId) }
+        };
+
+        const messageDiv = document.getElementById('message');
+        messageDiv.className = 'message-box';
+        messageDiv.textContent = 'Отправка...';
+
+        try {
+            const csrfToken = getCookie('XSRF-TOKEN');
+
+            const response = await fetch('/book/api/v1', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-XSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify(bookDto)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                messageDiv.className = 'message-box success';
+                messageDiv.textContent = 'Книга успешно создана!';
+                document.getElementById('bookForm').reset();
+            } else {
+                throw new Error(result.msg || 'Ошибка создания книги');
+            }
+        } catch (err) {
+            messageDiv.className = 'message-box error';
+            messageDiv.textContent = 'Ошибка: ' + err.message;
+        }
+    });
+
+    function getCookie(name) {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+</script>
+
+</body>
+</html>
