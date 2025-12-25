@@ -20,9 +20,4 @@ public class ShellCommand {
         var locale = LocaleContextHolder.getLocale();
         io.print(messageSource.getMessage("quiz.hello.simple", new Object[]{username}, locale));
     }
-
-//    @ShellMethod(key = {"start", "go", "Yes", "yes", "Да", "да"}, value = "Start quiz")
-//    public void startQuiz() {
-//        quizService.conductQuiz(io);
-//    }
 }

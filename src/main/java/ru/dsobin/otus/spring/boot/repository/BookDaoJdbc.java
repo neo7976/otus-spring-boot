@@ -2,7 +2,6 @@ package ru.dsobin.otus.spring.boot.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,9 +9,8 @@ import org.springframework.stereotype.Repository;
 import ru.dsobin.otus.spring.boot.dao.AuthorDao;
 import ru.dsobin.otus.spring.boot.dao.BookDao;
 import ru.dsobin.otus.spring.boot.dao.GenreDao;
-import ru.dsobin.otus.spring.boot.model.Author;
+import ru.dsobin.otus.spring.boot.mapper.RowMappers;
 import ru.dsobin.otus.spring.boot.model.Book;
-import ru.dsobin.otus.spring.boot.model.Genre;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,12 +37,7 @@ public class BookDaoJdbc implements BookDao {
                         "FROM books b " +
                         "JOIN authors a ON b.author_id = a.id " +
                         "JOIN genres g ON b.genre_id = g.id",
-                (rs, rowNum) -> new Book(
-                        rs.getLong("id"),
-                        rs.getString("title"),
-                        new Author(rs.getLong("author_id"), rs.getString("author_name")),
-                        new Genre(rs.getLong("genre_id"), rs.getString("genre_name"))
-                )
+                RowMappers.BOOK
         );
     }
     @Override
@@ -58,12 +51,7 @@ public class BookDaoJdbc implements BookDao {
                             "JOIN genres g ON b.genre_id = g.id " +
                             "WHERE b.id = :id",
                     Collections.singletonMap("id", id),
-                    (rs, rowNum) -> new Book(
-                            rs.getLong("id"),
-                            rs.getString("title"),
-                            new Author(rs.getLong("author_id"), rs.getString("author_name")),
-                            new Genre(rs.getLong("genre_id"), rs.getString("genre_name"))
-                    )
+                    RowMappers.BOOK
             );
         } catch (EmptyResultDataAccessException e) {
             return null;
