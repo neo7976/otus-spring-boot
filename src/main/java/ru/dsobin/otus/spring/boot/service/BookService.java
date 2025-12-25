@@ -5,6 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.dsobin.otus.spring.boot.dao.AuthorDao;
 import ru.dsobin.otus.spring.boot.dao.BookDao;
 import ru.dsobin.otus.spring.boot.dao.GenreDao;
@@ -23,6 +24,7 @@ public class BookService {
     private final MessageSource messageSource;
 
 
+    @Transactional
     public void listBooks() {
         var locale = LocaleContextHolder.getLocale();
         String authorTranslate = messageSource.getMessage("book.Author.translate", null, locale);
@@ -38,6 +40,7 @@ public class BookService {
         );
     }
 
+    @Transactional
     public void getBook(long id) {
         var locale = LocaleContextHolder.getLocale();
         try {
@@ -58,6 +61,7 @@ public class BookService {
     }
 
 
+    @Transactional
     public void createBook(String title, long authorId, long genreId) {
 
         var locale = LocaleContextHolder.getLocale();
@@ -68,6 +72,7 @@ public class BookService {
         io.print(messageSource.getMessage("book.create.with.id", new Object[]{book.getId()}, locale));
     }
 
+    @Transactional
     public void updateBook(long id, String title, long authorId, long genreId) {
 
         var locale = LocaleContextHolder.getLocale();
@@ -78,6 +83,7 @@ public class BookService {
         io.print(messageSource.getMessage("book.update", null, locale));
     }
 
+    @Transactional
     public void deleteBook(long id) {
         bookDao.deleteById(id);
         var locale = LocaleContextHolder.getLocale();
