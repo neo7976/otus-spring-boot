@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.dsobin.otus.spring.boot.dto.GenreDto;
-import ru.dsobin.otus.spring.boot.mapper.AuthorMapper;
 import ru.dsobin.otus.spring.boot.mapper.GenreMapper;
-import ru.dsobin.otus.spring.boot.model.Author;
 import ru.dsobin.otus.spring.boot.model.Genre;
-import ru.dsobin.otus.spring.boot.repository.AuthorRepository;
 import ru.dsobin.otus.spring.boot.repository.GenreRepository;
 
 import javax.persistence.EntityNotFoundException;

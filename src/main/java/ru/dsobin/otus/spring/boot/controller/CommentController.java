@@ -1,5 +1,6 @@
 package ru.dsobin.otus.spring.boot.controller;
 
+import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,6 @@ import ru.dsobin.otus.spring.boot.service.CommentService;
 import ru.dsobin.otus.spring.boot.utils.ResultUtil;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping(value = "/comment/api/v1", produces = "text/plain; charset=UTF-8")
