@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.shell.standard.ShellOption;
 import org.springframework.stereotype.Service;
 import ru.dsobin.otus.spring.boot.dao.AuthorDao;
 import ru.dsobin.otus.spring.boot.dao.BookDao;

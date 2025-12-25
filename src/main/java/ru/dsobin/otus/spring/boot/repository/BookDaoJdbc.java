@@ -6,9 +6,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.dsobin.otus.spring.boot.dao.AuthorDao;
 import ru.dsobin.otus.spring.boot.dao.BookDao;
-import ru.dsobin.otus.spring.boot.dao.GenreDao;
 import ru.dsobin.otus.spring.boot.mapper.RowMappers;
 import ru.dsobin.otus.spring.boot.model.Book;
 
@@ -21,8 +19,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookDaoJdbc implements BookDao {
     private final NamedParameterJdbcTemplate jdbc;
-    private final AuthorDao authorDao;
-    private final GenreDao genreDao;
 
     @Override
     public int count() {
