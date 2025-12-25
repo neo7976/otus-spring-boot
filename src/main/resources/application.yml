@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: otus-spring-boot
+  messages:
+    encoding: UTF-8
+    basename: messages
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: root
+    password: ""
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: always
