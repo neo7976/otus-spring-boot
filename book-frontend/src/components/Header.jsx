@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
     const navigate = useNavigate();
-    const isAuthenticated = !!localStorage.getItem('authToken');
+    const isAuthenticated = !!localStorage.getItem('jwtToken');
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('jwtToken');
         // Также можно очистить другие данные (например, пользователя)
         navigate('/login');
     };

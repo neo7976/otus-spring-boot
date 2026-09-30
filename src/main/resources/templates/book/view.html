@@ -35,7 +35,10 @@
 
 </div>
 
+<script th:src="@{/js/auth.js}"></script>
 <script th:inline="javascript">
+    requireAuth();
+
     // Thymeleaf подставит bookId
     const bookId = /*[[${bookId}]]*/ 0;
     console.log("Book ID:", bookId); // для отладки
@@ -50,15 +53,12 @@
         const text = document.getElementById('commentText').value.trim();
         if (!text) return;
 
-        const csrfToken = getCookie('XSRF-TOKEN');
-
         try {
             // 🔥 ИСПРАВЛЕНО: правильный URL
-            const response = await fetch(`/comment/api/v1/add-comment/${bookId}`, {
+            const response = await authFetch(`/comment/api/v1/add-comment/${bookId}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': csrfToken
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ text })
             });
@@ -82,16 +82,11 @@
         }
     });
 
-    function getCookie(name) {
-        let v = "; " + document.cookie;
-        let p = v.split("; " + name + "=");
-        return p.length === 2 ? p.pop().split(";").shift() : null;
-    }
 
     // Загрузка комментариев
     async function loadComments() {
         try {
-            const response = await fetch(`/book/api/v1/${bookId}`);
+            const response = await authFetch(`/book/api/v1/${bookId}`);
             if (!response.ok) throw new Error('Не удалось загрузить книгу');
 
             const result = await response.json();

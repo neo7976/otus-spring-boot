@@ -49,7 +49,10 @@
 
 </div>
 
+<script th:src="@{/js/auth.js}"></script>
 <script>
+    requireAuth();
+
     document.getElementById('bookForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -68,13 +71,10 @@
         messageDiv.textContent = 'Отправка...';
 
         try {
-            const csrfToken = getCookie('XSRF-TOKEN');
-
-            const response = await fetch('/book/api/v1', {
+            const response = await authFetch('/book/api/v1', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-XSRF-TOKEN': csrfToken
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(bookDto)
             });
@@ -94,11 +94,6 @@
         }
     });
 
-    function getCookie(name) {
-        let value = "; " + document.cookie;
-        let parts = value.split("; " + name + "=");
-        if (parts.length === 2) return parts.pop().split(";").shift();
-    }
 </script>
 
 </body>

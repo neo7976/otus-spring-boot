@@ -30,6 +30,7 @@
 
 </div>
 
+<script th:src="@{/js/auth.js}"></script>
 <script>
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -62,8 +63,7 @@
                 const data = await response.json();
                 const token = data.token;
 
-                // Сохраняем токен (например, в localStorage)
-                localStorage.setItem('jwtToken', token);
+                saveToken(token);
 
                 // Показываем успех и редиректим
                 successMsg.textContent = '✅ Успешный вход! Перенаправление...';
@@ -75,8 +75,8 @@
                     window.location.href = '/';
                 }, 1000);
             } else {
-                const errorText = await response.text();
-                errorMsg.textContent = errorText || 'Неверные учетные данные';
+                const result = await response.json().catch(() => ({}));
+                errorMsg.textContent = result.msg || 'Неверные учетные данные';
                 errorMsg.style.display = 'block';
             }
         } catch (err) {

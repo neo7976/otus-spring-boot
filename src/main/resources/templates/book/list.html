@@ -84,7 +84,10 @@
 
 </div>
 
+<script th:src="@{/js/auth.js}"></script>
 <script>
+    requireAuth();
+
     const form = document.getElementById('filterForm');
     const booksBody = document.getElementById('booksBody');
     const loading = document.getElementById('loading');
@@ -125,7 +128,7 @@
         loading.style.display = 'block';
         errorDiv.textContent = '';
 
-        fetch(url)
+        authFetch(url)
             .then(response => {
                 if (!response.ok) throw new Error('Ошибка запроса');
                 return response.json();
@@ -192,7 +195,7 @@
         document.getElementById('commentsModal').style.display = 'flex';
 
         try {
-            const response = await fetch(`/book/api/v1/${bookId}`);
+            const response = await authFetch(`/book/api/v1/${bookId}`);
             if (!response.ok) throw new Error('Не удалось загрузить книгу');
 
             const result = await response.json();

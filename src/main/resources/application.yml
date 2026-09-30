@@ -26,5 +26,7 @@ server:
   port: 9000
 
 jwt:
-  app_name: BOOK-SERVICE
-  jwt_secret: 77b473c7e99419be84718b0727a69b4310fc07deba68bad8ea7be17e5ef88ef9asdfghj8756432qwrefdsgd
+  issuer: BOOK-SERVICE
+  # Base64, >= 256 бит. В проде задаётся через переменную окружения JWT_SECRET
+  secret: ${JWT_SECRET:hB/CZNqBZGLRo5BdnWnkZrhGiqhpOZXLxLdlyIbHWA7XP7iQfj7RG1Sq/kKjN3RBlCacPR7dSRCQV+5p6lTJUg==}
+  expiration: 30m

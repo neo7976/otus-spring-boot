@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Добро пожаловать</title>
@@ -14,8 +13,8 @@
 </head>
 <body>
 <div class="user-info">
-    <span sec:authentication="name">User</span>, добро пожаловать!
-    <a href="#" onclick="document.getElementById('logoutForm').submit(); return false;">Выйти</a>
+    <span id="username">User</span>, добро пожаловать!
+    <a href="#" onclick="logout(); return false;">Выйти</a>
 </div>
 
 <h1>Добро пожаловать в библиотеку!</h1>
@@ -25,12 +24,17 @@
     <!-- Добавьте другие ссылки по мере реализации -->
 </div>
 
-<div class="nav" sec:authorize="hasRole('ADMIN')">
+<div class="nav" id="adminNav" style="display:none;">
     <a href="/book/create">➕ Добавить книгу</a>
 </div>
 
-<form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;">
-    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-</form>
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    requireAuth();
+    document.getElementById('username').textContent = getTokenPayload()?.sub || '';
+    if (hasRole('ROLE_ADMIN')) {
+        document.getElementById('adminNav').style.display = 'block';
+    }
+</script>
 </body>
 </html>

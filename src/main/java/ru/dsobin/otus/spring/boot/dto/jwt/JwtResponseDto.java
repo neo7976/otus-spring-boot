@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JwtResponseDto {
-    private String status;
-    private String message;
     private String token;
-    private Long id;
+    private String tokenType;
+    /**
+     * Время жизни токена в секундах
+     */
+    private long expiresIn;
 }

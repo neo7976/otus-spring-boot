@@ -81,11 +81,11 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("Поиск книги по ID. Без авторизации блок")
-    void redirectFindById() throws Exception {
+    @DisplayName("Поиск книги по ID. Без авторизации - 401")
+    void unauthorizedFindById() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                         .get(bookUrl + "/9999"))
-                .andExpect(status().isForbidden())
+                .andExpect(status().isUnauthorized())
                 .andReturn()
                 .getResponse().getContentAsString(Charset.defaultCharset());
     }

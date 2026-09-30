@@ -7,6 +7,7 @@ import Home from './components/Home';
 import BookList from './components/BookList';
 import CreateBook from './components/CreateBook';
 import BookView from './components/BookView';
+import PrivateRoute from './components/PrivateRoute';
 
 
 function App() {
@@ -17,10 +18,10 @@ function App() {
                 <main className="app-main">
                     <Routes>
                         <Route path="/login" element={<Login />} />
-                        <Route path="/" element={<Home />} />
-                        <Route path="/list" element={<BookList />} />
-                        <Route path="/book/create" element={<CreateBook />} />
-                        <Route path="/book/:id/comment" element={<BookView />} />
+                        <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+                        <Route path="/list" element={<PrivateRoute><BookList /></PrivateRoute>} />
+                        <Route path="/book/create" element={<PrivateRoute><CreateBook /></PrivateRoute>} />
+                        <Route path="/book/:id/comment" element={<PrivateRoute><BookView /></PrivateRoute>} />
                     </Routes>
                 </main>
             </div>
