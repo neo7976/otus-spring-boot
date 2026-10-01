@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.dsobin.otus.spring.boot.actuator.LibraryMetrics;
 import ru.dsobin.otus.spring.boot.domain.BookSpecifications;
 import ru.dsobin.otus.spring.boot.dto.BookDto;
 import ru.dsobin.otus.spring.boot.dto.result.PageDataDto;
@@ -32,6 +33,7 @@ public class BookService {
     private final AuthorService authorService;
     private final GenreService genreService;
     private final MessageSource messageSource;
+    private final LibraryMetrics libraryMetrics;
     private static final Locale locale = LocaleContextHolder.getLocale();
 
     @Transactional(readOnly = true)
@@ -67,7 +69,9 @@ public class BookService {
 
         book.setAuthor(author);
         book.setGenre(genre);
-        return bookRepository.save(book);
+        Book saved = bookRepository.save(book);
+        libraryMetrics.bookCreated();
+        return saved;
     }
 
     @Transactional
@@ -76,12 +80,14 @@ public class BookService {
         Genre genre = genreService.findById(dto.getGenre().getGenreId());
         Book book = BookMapper.toEntity(dto, author, genre);
 
-        return Optional.of(bookRepository.save(book))
+        BookDto created = Optional.of(bookRepository.save(book))
                 .map(BookMapper::toDto)
                 .orElseThrow(() -> new RuntimeException(messageSource.getMessage(
                         "book.not.create",
                         null,
                         locale)));
+        libraryMetrics.bookCreated();
+        return created;
     }
 
     @Transactional
@@ -116,6 +122,7 @@ public class BookService {
     @Transactional
     public boolean deleteById(Long id) {
         bookRepository.deleteById(id);
+        libraryMetrics.bookDeleted();
         return !bookRepository.existsById(id);
     }
 }

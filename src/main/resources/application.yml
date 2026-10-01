@@ -25,6 +25,27 @@ spring:
 server:
   port: 9000
 
+logging:
+  file:
+    name: logs/otus-spring-boot.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,logfile
+  endpoint:
+    health:
+      # Детали (БД, диск, каталог книг) видит только администратор
+      show-details: when-authorized
+      roles: ADMIN
+
+info:
+  app:
+    name: '@project.name@'
+    description: Библиотека книг
+    version: '@project.version@'
+
 jwt:
   issuer: BOOK-SERVICE
   # Base64, >= 256 бит. В проде задаётся через переменную окружения JWT_SECRET
