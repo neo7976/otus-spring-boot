@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: otus-spring-boot
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  liquibase:
+    change-log: classpath:liquibase/changelog.xml
+  h2:
+    console:
+      enabled: true
+#  sql:
+#    init:
+#      mode: always
+server:
+  port: 9000
+
+logging:
+  file:
+    name: logs/otus-spring-boot.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,logfile
+  endpoint:
+    health:
+      # Детали (БД, диск, каталог книг) видит только администратор
+      show-details: when-authorized
+      roles: ADMIN
+
+info:
+  app:
+    name: '@project.name@'
+    description: Библиотека книг
+    version: '@project.version@'
+
+rating-service:
+  url: ${RATING_SERVICE_URL:http://localhost:9100}
+
+feign:
+  circuitbreaker:
+    # Оборачивает каждый вызов Feign-клиента в circuit breaker и включает fallback
+    enabled: true
+  client:
+    config:
+      rating-service:
+        connect-timeout: 1000
+        read-timeout: 2000
+
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        # По умолчанию 1s — меньше read-timeout Feign, увеличиваем
+        timeout-duration: 3s
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+
+jwt:
+  issuer: BOOK-SERVICE
+  # Base64, >= 256 бит. В проде задаётся через переменную окружения JWT_SECRET
+  secret: ${JWT_SECRET:hB/CZNqBZGLRo5BdnWnkZrhGiqhpOZXLxLdlyIbHWA7XP7iQfj7RG1Sq/kKjN3RBlCacPR7dSRCQV+5p6lTJUg==}
+  expiration: 30m
