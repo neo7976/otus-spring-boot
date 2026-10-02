@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добро пожаловать</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .nav { margin: 20px 0; }
+        .nav a { margin-right: 15px; text-decoration: none; color: #007BFF; }
+        .nav a:hover { text-decoration: underline; }
+        .user-info { color: #555; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="user-info">
+    <span id="username">User</span>, добро пожаловать!
+    <a href="#" onclick="logout(); return false;">Выйти</a>
+</div>
+
+<h1>Добро пожаловать в библиотеку!</h1>
+
+<div class="nav">
+    <a href="/book/list">📖 Список книг</a>
+    <!-- Добавьте другие ссылки по мере реализации -->
+</div>
+
+<div class="nav" id="adminNav" style="display:none;">
+    <a href="/book/create">➕ Добавить книгу</a>
+</div>
+
+<script th:src="@{/js/auth.js}"></script>
+<script>
+    requireAuth();
+    document.getElementById('username').textContent = getTokenPayload()?.sub || '';
+    if (hasRole('ROLE_ADMIN')) {
+        document.getElementById('adminNav').style.display = 'block';
+    }
+</script>
+</body>
+</html>
