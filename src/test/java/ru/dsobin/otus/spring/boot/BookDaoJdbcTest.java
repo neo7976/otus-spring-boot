@@ -18,7 +18,7 @@ import ru.dsobin.otus.spring.boot.repository.GenreDaoJdbc;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJdbcTest
 @Import({BookDaoJdbc.class, AuthorDaoJdbc.class, GenreDaoJdbc.class})
@@ -59,11 +59,16 @@ class BookDaoJdbcTest {
 
         // when
         Book saved = bookDao.insert(book);
-        Book found = bookDao.findById(saved.getId());
+        Book found = bookDao.findById(saved.getId()).orElseThrow();
 
         // then
         assertThat(found.getTitle()).isEqualTo("Тест Книга");
         assertThat(found.getAuthor().getName()).isEqualTo("Тест Автор");
         assertThat(found.getGenre().getName()).isEqualTo("Тест Жанр");
+    }
+
+    @Test
+    void shouldReturnEmptyWhenBookNotFound() {
+        assertThat(bookDao.findById(999_999L)).isEmpty();
     }
 }

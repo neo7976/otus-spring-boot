@@ -9,6 +9,7 @@ import ru.dsobin.otus.spring.boot.model.Author;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,11 +23,11 @@ public class AuthorDaoJdbc implements AuthorDao {
     }
 
     @Override
-    public Author findById(Long id) {
-        return jdbc.queryForObject(
+    public Optional<Author> findById(Long id) {
+        return jdbc.query(
                 "SELECT id, name FROM authors WHERE id = :id",
                 Map.of("id", id),
                 RowMappers.AUTHOR
-        );
+        ).stream().findFirst();
     }
 }

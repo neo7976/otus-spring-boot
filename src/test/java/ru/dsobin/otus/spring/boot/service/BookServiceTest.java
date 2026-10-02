@@ -1,28 +1,34 @@
 package ru.dsobin.otus.spring.boot.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.EmptyResultDataAccessException;
 import ru.dsobin.otus.spring.boot.dao.AuthorDao;
 import ru.dsobin.otus.spring.boot.dao.BookDao;
 import ru.dsobin.otus.spring.boot.dao.GenreDao;
+import ru.dsobin.otus.spring.boot.exception.EntityNotFoundException;
 import ru.dsobin.otus.spring.boot.model.Author;
 import ru.dsobin.otus.spring.boot.model.Book;
 import ru.dsobin.otus.spring.boot.model.Genre;
 
-import java.util.Locale;
+import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
+
+    private static final Author AUTHOR = new Author(1L, "Tolkien");
+    private static final Genre GENRE = new Genre(2L, "Fantasy");
 
     @Mock
     private BookDao bookDao;
@@ -30,134 +36,89 @@ class BookServiceTest {
     private AuthorDao authorDao;
     @Mock
     private GenreDao genreDao;
-    @Mock
-    private ConsoleIOService io;
-    @Mock
-    private MessageSource messageSource;
 
     @InjectMocks
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
-    private final Locale testLocale = Locale.ENGLISH;
+    @Test
+    void findAll_returnsBooksFromDao() {
+        Book book = new Book(1L, "The Hobbit", AUTHOR, GENRE);
+        when(bookDao.findAll()).thenReturn(List.of(book));
 
-    @BeforeEach
-    void setUp() {
-        // Устанавливаем локаль для всех тестов (имитируем LocaleContextHolder)
-        LocaleContextHolder.setLocale(testLocale);
+        assertThat(bookService.findAll()).containsExactly(book);
     }
 
     @Test
-    void listBooks_shouldPrintAllBooks() {
-        // given
-        Author author = new Author(1L, "Tolkien");
-        Genre genre = new Genre(2L, "Fantasy");
-        Book book = new Book(1L, "The Hobbit", author, genre);
-        when(bookDao.findAll()).thenReturn(java.util.List.of(book));
-        when(messageSource.getMessage("book.Author.translate", null, testLocale)).thenReturn("Author");
-        when(messageSource.getMessage("book.Genre.translate", null, testLocale)).thenReturn("Genre");
+    void findById_returnsBookWhenFound() {
+        Book book = new Book(10L, "1984", AUTHOR, GENRE);
+        when(bookDao.findById(10L)).thenReturn(Optional.of(book));
 
-        // when
-        bookService.listBooks();
-
-        // then
-        String expected = "1: The Hobbit (Author: Tolkien, Genre: Fantasy)" + System.lineSeparator();
-        verify(io).print(expected);
-
-        verify(bookDao).findAll();
+        assertThat(bookService.findById(10L)).contains(book);
     }
 
     @Test
-    void getBook_shouldPrintBookWhenFound() {
-        // given
-        Author author = new Author(1L, "Orwell");
-        Genre genre = new Genre(2L, "Dystopia");
-        Book book = new Book(10L, "1984", author, genre);
-        when(bookDao.findById(10L)).thenReturn(book);
-        when(messageSource.getMessage("book.Book.translate", null, testLocale)).thenReturn("Book");
-        when(messageSource.getMessage("book.Author.translate", null, testLocale)).thenReturn("Author");
-        when(messageSource.getMessage("book.Genre.translate", null, testLocale)).thenReturn("Genre");
+    void findById_returnsEmptyWhenNotFound() {
+        when(bookDao.findById(999L)).thenReturn(Optional.empty());
 
-        // when
-        bookService.getBook(10L);
-
-        // then
-        String expected = "Book: 1984 (Author: Orwell, Genre: Dystopia)" + System.lineSeparator();
-        verify(io).print(expected);
+        assertThat(bookService.findById(999L)).isEmpty();
     }
 
     @Test
-    void getBook_shouldHandleNotFound() {
-        // given
-        when(bookDao.findById(999L)).thenThrow(new EmptyResultDataAccessException(1));
-        when(messageSource.getMessage("book.not.found.with.id", new Object[]{999L}, testLocale))
-                .thenReturn("Book with ID 999 not found");
+    void create_insertsBookWithAuthorAndGenre() {
+        when(authorDao.findById(1L)).thenReturn(Optional.of(AUTHOR));
+        when(genreDao.findById(2L)).thenReturn(Optional.of(GENRE));
+        when(bookDao.insert(any(Book.class))).thenAnswer(inv -> {
+            Book book = inv.getArgument(0);
+            book.setId(100L);
+            return book;
+        });
 
-        // when
-        bookService.getBook(999L);
+        Book created = bookService.create("New Book", 1L, 2L);
 
-        // then
-        verify(io).print("Book with ID 999 not found");
-        verify(bookDao).findById(999L);
+        assertThat(created.getId()).isEqualTo(100L);
+        assertThat(created.getTitle()).isEqualTo("New Book");
+        assertThat(created.getAuthor()).isEqualTo(AUTHOR);
+        assertThat(created.getGenre()).isEqualTo(GENRE);
     }
 
     @Test
-    void createBook_shouldInsertAndPrintSuccessMessage() {
-        // given
-        Author author = new Author(1L, "Author");
-        Genre genre = new Genre(2L, "Genre");
-        Book insertedBook = new Book(100L, "New Book", author, genre);
-        when(authorDao.findById(1L)).thenReturn(author);
-        when(genreDao.findById(2L)).thenReturn(genre);
-        when(bookDao.insert(any(Book.class))).thenReturn(insertedBook);
-        when(messageSource.getMessage("book.create.with.id", new Object[]{100L}, testLocale))
-                .thenReturn("Book created with ID 100");
+    void create_throwsWhenAuthorNotFound() {
+        when(authorDao.findById(5L)).thenReturn(Optional.empty());
 
-        // when
-        bookService.createBook("New Book", 1L, 2L);
-
-        // then
-        verify(bookDao).insert(argThat(b ->
-                b.getTitle().equals("New Book") &&
-                        b.getAuthor().getId().equals(1L) &&
-                        b.getGenre().getId().equals(2L)
-        ));
-        verify(io).print("Book created with ID 100");
+        assertThatThrownBy(() -> bookService.create("New Book", 5L, 2L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .extracting("messageCode").isEqualTo("author.not.found.with.id");
+        verify(bookDao, never()).insert(any());
     }
 
     @Test
-    void updateBook_shouldUpdateAndPrintSuccessMessage() {
-        // given
-        Author author = new Author(3L, "Updated Author");
-        Genre genre = new Genre(4L, "Updated Genre");
-        when(authorDao.findById(3L)).thenReturn(author);
-        when(genreDao.findById(4L)).thenReturn(genre);
-        when(messageSource.getMessage("book.update", null, testLocale))
-                .thenReturn("Book updated");
+    void update_updatesExistingBook() {
+        Book existing = new Book(50L, "Old Title", AUTHOR, GENRE);
+        when(bookDao.findById(50L)).thenReturn(Optional.of(existing));
+        when(authorDao.findById(1L)).thenReturn(Optional.of(AUTHOR));
+        when(genreDao.findById(2L)).thenReturn(Optional.of(GENRE));
+        when(bookDao.update(any(Book.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        // when
-        bookService.updateBook(50L, "Updated Title", 3L, 4L);
+        Book updated = bookService.update(50L, "Updated Title", 1L, 2L);
 
-        // then
-        verify(bookDao).update(argThat(b ->
-                b.getId().equals(50L) &&
-                        b.getTitle().equals("Updated Title") &&
-                        b.getAuthor().getId().equals(3L) &&
-                        b.getGenre().getId().equals(4L)
-        ));
-        verify(io).print("Book updated");
+        assertThat(updated.getTitle()).isEqualTo("Updated Title");
+        verify(bookDao).update(argThat(b -> b.getId().equals(50L) && b.getTitle().equals("Updated Title")));
     }
 
     @Test
-    void deleteBook_shouldDeleteAndPrintSuccessMessage() {
-        // given
-        when(messageSource.getMessage("book.delete", null, testLocale))
-                .thenReturn("Book deleted");
+    void update_throwsWhenBookNotFound() {
+        when(bookDao.findById(50L)).thenReturn(Optional.empty());
 
-        // when
-        bookService.deleteBook(77L);
+        assertThatThrownBy(() -> bookService.update(50L, "Title", 1L, 2L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .extracting("messageCode").isEqualTo("book.not.found.with.id");
+        verify(bookDao, never()).update(any());
+    }
 
-        // then
+    @Test
+    void deleteById_delegatesToDao() {
+        bookService.deleteById(77L);
+
         verify(bookDao).deleteById(77L);
-        verify(io).print("Book deleted");
     }
 }

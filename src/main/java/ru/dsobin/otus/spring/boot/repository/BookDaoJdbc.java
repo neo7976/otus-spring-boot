@@ -1,7 +1,6 @@
 package ru.dsobin.otus.spring.boot.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,21 +37,17 @@ public class BookDaoJdbc implements BookDao {
         );
     }
     @Override
-    public Book findById(Long id) {
-        try {
-            return jdbc.queryForObject(
-                    "SELECT b.id, b.title, b.author_id, b.genre_id, " +
-                            "a.name as author_name, g.name as genre_name " +
-                            "FROM books b " +
-                            "JOIN authors a ON b.author_id = a.id " +
-                            "JOIN genres g ON b.genre_id = g.id " +
-                            "WHERE b.id = :id",
-                    Collections.singletonMap("id", id),
-                    RowMappers.BOOK
-            );
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+    public Optional<Book> findById(Long id) {
+        return jdbc.query(
+                "SELECT b.id, b.title, b.author_id, b.genre_id, " +
+                        "a.name as author_name, g.name as genre_name " +
+                        "FROM books b " +
+                        "JOIN authors a ON b.author_id = a.id " +
+                        "JOIN genres g ON b.genre_id = g.id " +
+                        "WHERE b.id = :id",
+                Collections.singletonMap("id", id),
+                RowMappers.BOOK
+        ).stream().findFirst();
     }
 
     @Override

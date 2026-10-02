@@ -9,6 +9,7 @@ import ru.dsobin.otus.spring.boot.model.Genre;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,11 +22,11 @@ public class GenreDaoJdbc implements GenreDao {
     }
 
     @Override
-    public Genre findById(Long id) {
-        return jdbc.queryForObject(
+    public Optional<Genre> findById(Long id) {
+        return jdbc.query(
                 "SELECT id, name FROM genres WHERE id = :id",
                 Map.of("id", id),
                 RowMappers.GENRE
-        );
+        ).stream().findFirst();
     }
 }
