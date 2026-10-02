@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dsobin.otus.spring.boot.dto.BookDto;
 import ru.dsobin.otus.spring.boot.dto.result.PageDataDto;
+import ru.dsobin.otus.spring.boot.dto.rating.RateBookDto;
+import ru.dsobin.otus.spring.boot.dto.rating.RatingSummaryDto;
 import ru.dsobin.otus.spring.boot.dto.result.ResultDto;
 import ru.dsobin.otus.spring.boot.filter.BookPageInfoDto;
+import ru.dsobin.otus.spring.boot.service.BookRatingService;
 import ru.dsobin.otus.spring.boot.service.BookService;
 import ru.dsobin.otus.spring.boot.utils.ResultUtil;
 
@@ -31,13 +36,25 @@ import javax.servlet.http.HttpServletRequest;
 public class BookController {
 
     private final BookService bookService;
+    private final BookRatingService bookRatingService;
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResultDto<BookDto>> findById(
             @PathVariable("id") Long id,
             HttpServletRequest request) {
         BookDto book = bookService.findById(id);
+        book.setRating(bookRatingService.getSummary(id));
         return ResponseEntity.ok(ResultUtil.createSuccess(book));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PostMapping(value = "/{id}/rating", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResultDto<RatingSummaryDto>> rateBook(
+            @PathVariable("id") Long id,
+            @RequestBody RateBookDto dto,
+            @AuthenticationPrincipal UserDetails user) {
+        RatingSummaryDto rating = bookRatingService.rate(id, user.getUsername(), dto.getScore());
+        return ResponseEntity.ok(ResultUtil.createSuccess(rating));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")

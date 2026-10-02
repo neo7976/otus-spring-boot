@@ -3,9 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 
 export default function BookView() {
-    const { id } = useParams(); // из URL: /book/5/comment
+    const { id } = useParams(); // из URL: /book/5
     const [commentText, setCommentText] = useState('');
+    const [book, setBook] = useState(null);
     const [comments, setComments] = useState([]);
+    const [rating, setRating] = useState(null);
     const [message, setMessage] = useState({ type: '', text: '' });
     const navigate = useNavigate();
 
@@ -17,10 +19,35 @@ export default function BookView() {
     const loadComments = async () => {
         try {
             const res = await api.get(`/book/api/v1/${id}`);
+            setBook(res.data.value);
             setComments(res.data.value.comments || []);
+            // Рейтинг book-service получает из rating-service через Feign
+            setRating(res.data.value.rating);
         } catch (err) {
-            setMessage({ type: 'error', text: 'Не удалось загрузить комментарии' });
+            setMessage({ type: 'error', text: 'Не удалось загрузить книгу' });
         }
+    };
+
+    const handleRate = async (score) => {
+        try {
+            const res = await api.post(`/book/api/v1/${id}/rating`, { score });
+            setRating(res.data.value);
+            setMessage({ type: 'success', text: `✅ Ваша оценка ${score} сохранена` });
+            setTimeout(() => setMessage({ type: '', text: '' }), 2000);
+        } catch (err) {
+            // 503 — rating-service недоступен, сработал fallback
+            setMessage({ type: 'error', text: '❌ ' + (err.response?.data?.msg || 'Не удалось сохранить оценку') });
+        }
+    };
+
+    const renderRating = () => {
+        if (!rating || !rating.available) {
+            return <span className="rating-unavailable">временно недоступен</span>;
+        }
+        if (rating.count === 0) {
+            return <span>оценок пока нет</span>;
+        }
+        return <span><strong>{rating.average}</strong> ★ (оценок: {rating.count})</span>;
     };
 
     const handleSubmit = async (e) => {
@@ -40,14 +67,38 @@ export default function BookView() {
 
     return (
         <div className="container">
-            <h1>💬 Добавить комментарий</h1>
-            <p className="book-id">Книга ID: <strong>{id}</strong></p>
+            <h1>📖 {book ? book.title : 'Загрузка...'}</h1>
+            {book && (
+                <p className="book-meta">
+                    Автор: <strong>{book.author?.name || '—'}</strong>
+                    {' · '}
+                    Жанр: <strong>{book.genre?.name || '—'}</strong>
+                </p>
+            )}
 
             {message.text && (
                 <div className={`message-box ${message.type}`}>
                     {message.text}
                 </div>
             )}
+
+            <div className="form-card rating-card">
+                <p>Рейтинг: {renderRating()}</p>
+                <div className="rating-stars">
+                    <span>Ваша оценка:</span>
+                    {[1, 2, 3, 4, 5].map(score => (
+                        <button
+                            key={score}
+                            type="button"
+                            className="star-btn"
+                            title={`Оценить на ${score}`}
+                            onClick={() => handleRate(score)}
+                        >
+                            {score} ★
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             <div className="form-card">
                 <form onSubmit={handleSubmit}>
@@ -90,7 +141,7 @@ export default function BookView() {
                 )}
             </div>
 
-            <button className="back-link" onClick={() => navigate('/')}>
+            <button className="back-link" onClick={() => navigate('/list')}>
                 ← Назад к списку
             </button>
         </div>

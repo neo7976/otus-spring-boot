@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import ru.dsobin.otus.spring.boot.dto.rating.RatingSummaryDto;
 
 import java.util.List;
 
@@ -24,4 +25,9 @@ public class BookDto {
     private GenreDto genre;
 
     private List<CommentDto> comments;
+
+    /**
+     * Рейтинг из rating-service (заполняется только при запросе одной книги)
+     */
+    private RatingSummaryDto rating;
 }

@@ -226,3 +226,38 @@ a.btn-secondary {
   color: #6c757d;
   font-size: 1.1rem;
 }
+/* Рейтинг книги */
+.rating-card p {
+    margin: 0 0 10px;
+}
+
+.rating-stars {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.star-btn {
+    padding: 6px 12px;
+    border: 1px solid #f0ad4e;
+    border-radius: 6px;
+    background: #fff;
+    color: #b8860b;
+    cursor: pointer;
+}
+
+.star-btn:hover {
+    background: #f0ad4e;
+    color: #fff;
+}
+
+.rating-unavailable {
+    color: #999;
+    font-style: italic;
+}
+
+.book-meta {
+    color: #555;
+    margin: 0 0 20px;
+}

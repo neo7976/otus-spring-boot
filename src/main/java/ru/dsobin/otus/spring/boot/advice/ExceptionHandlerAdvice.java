@@ -6,6 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.dsobin.otus.spring.boot.client.rating.RatingServiceUnavailableException;
 import ru.dsobin.otus.spring.boot.dto.result.ResultDto;
 import ru.dsobin.otus.spring.boot.dto.result.ResultStatusDto;
 
@@ -17,6 +18,12 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler({RuntimeException.class, EntityNotFoundException.class})
     public ResponseEntity<ResultStatusDto> exceptionHandler(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ResultDto<>(false, e.getMessage(), null));
+    }
+
+    @ExceptionHandler(RatingServiceUnavailableException.class)
+    public ResponseEntity<ResultStatusDto> serviceUnavailableExceptionHandler(RatingServiceUnavailableException e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ResultDto<>(false, e.getMessage(), null));
     }
 

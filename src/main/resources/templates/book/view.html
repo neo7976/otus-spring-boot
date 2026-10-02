@@ -12,6 +12,19 @@
     <h1>💬 Добавить комментарий</h1>
     <p class="book-id">Книга ID: <strong th:text="${bookId}">1</strong></p>
 
+    <!-- Рейтинг приходит из rating-service через book-service -->
+    <div class="form-card">
+        <p>Рейтинг: <strong id="ratingValue">—</strong></p>
+        <div>
+            Ваша оценка:
+            <button type="button" class="btn btn-sm" onclick="rateBook(1)">1</button>
+            <button type="button" class="btn btn-sm" onclick="rateBook(2)">2</button>
+            <button type="button" class="btn btn-sm" onclick="rateBook(3)">3</button>
+            <button type="button" class="btn btn-sm" onclick="rateBook(4)">4</button>
+            <button type="button" class="btn btn-sm" onclick="rateBook(5)">5</button>
+        </div>
+    </div>
+
     <div class="form-card">
         <form id="commentForm">
             <div class="form-group">
@@ -84,6 +97,35 @@
 
 
     // Загрузка комментариев
+    function renderRating(rating) {
+        const el = document.getElementById('ratingValue');
+        if (!rating || !rating.available) {
+            el.textContent = 'временно недоступен';
+        } else if (rating.count === 0) {
+            el.textContent = 'оценок пока нет';
+        } else {
+            el.textContent = `${rating.average} ★ (оценок: ${rating.count})`;
+        }
+    }
+
+    async function rateBook(score) {
+        const messageDiv = document.getElementById('message');
+        const response = await authFetch(`/book/api/v1/${bookId}/rating`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({score})
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+            renderRating(result.value);
+            messageDiv.className = 'message-box success';
+            messageDiv.textContent = '✅ Оценка сохранена';
+        } else {
+            messageDiv.className = 'message-box error';
+            messageDiv.textContent = '❌ ' + (result.msg || 'Не удалось сохранить оценку');
+        }
+    }
+
     async function loadComments() {
         try {
             const response = await authFetch(`/book/api/v1/${bookId}`);
@@ -93,6 +135,7 @@
             if (!result.success) throw new Error('Ошибка сервера');
 
             const book = result.value;
+            renderRating(book.rating);
             const comments = book.comments || [];
 
             const list = document.getElementById('commentsList');

@@ -21,6 +21,7 @@ function App() {
                         <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
                         <Route path="/list" element={<PrivateRoute><BookList /></PrivateRoute>} />
                         <Route path="/book/create" element={<PrivateRoute><CreateBook /></PrivateRoute>} />
+                        <Route path="/book/:id" element={<PrivateRoute><BookView /></PrivateRoute>} />
                         <Route path="/book/:id/comment" element={<PrivateRoute><BookView /></PrivateRoute>} />
                     </Routes>
                 </main>

@@ -84,7 +84,7 @@ export default function BookList() {
                     {books.map(book => (
                         <tr key={book.bookId}>
                             <td>{book.bookId}</td>
-                            <td>{book.title}</td>
+                            <td><Link to={`/book/${book.bookId}`}>{book.title}</Link></td>
                             <td>{book.author?.name}</td>
                             <td>{book.genre?.name}</td>
                             <td>
@@ -97,10 +97,10 @@ export default function BookList() {
                                 </button>
                                 &nbsp;
                                 <Link
-                                    to={`/book/${book.bookId}/comment`}
+                                    to={`/book/${book.bookId}`}
                                     className="btn btn-outline-info btn-sm"
                                 >
-                                    Добавить
+                                    Открыть
                                 </Link>
                             </td>
                         </tr>
