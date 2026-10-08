@@ -1,0 +1,4 @@
+# В контекст сборки book-service попадают только pom.xml и src
+*
+!pom.xml
+!src

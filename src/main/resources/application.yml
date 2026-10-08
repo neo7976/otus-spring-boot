@@ -1,9 +1,10 @@
 spring:
   application:
     name: otus-spring-boot
+  # По умолчанию H2 в памяти; в Docker переопределяется переменными SPRING_DATASOURCE_*.
+  # Драйвер и диалект Hibernate определяются по URL автоматически.
   datasource:
     url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
     username: sa
     password: ""
   jpa:
@@ -13,7 +14,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
   liquibase:
     change-log: classpath:liquibase/changelog.xml
   h2:
@@ -27,7 +27,8 @@ server:
 
 logging:
   file:
-    name: logs/otus-spring-boot.log
+    # В Docker отключается (LOGGING_FILE_NAME=""): логи идут только в stdout
+    name: ${LOGGING_FILE_NAME:logs/otus-spring-boot.log}
 
 management:
   endpoints:
