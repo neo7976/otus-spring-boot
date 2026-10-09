@@ -2,6 +2,7 @@ package ru.dsobin.otus.spring.boot.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.KafkaException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,12 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<ResultStatusDto> exceptionHandler(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ResultDto<>(false, e.getMessage(), null));
+    }
+
+    @ExceptionHandler(KafkaException.class)
+    public ResponseEntity<ResultStatusDto> kafkaExceptionHandler(KafkaException e) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ResultDto<>(false, "Брокер сообщений недоступен, повторите позже", null));
     }
 
     @ExceptionHandler(RatingServiceUnavailableException.class)

@@ -74,6 +74,18 @@ resilience4j:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
 
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  topic:
+    book-ratings: book-ratings
+  producer:
+    acks: all
+    retries: 3
+    properties:
+      max.block.ms: 5000
+      request.timeout.ms: 5000
+      delivery.timeout.ms: 10000
+
 jwt:
   issuer: BOOK-SERVICE
   # Base64, >= 256 бит. В проде задаётся через переменную окружения JWT_SECRET

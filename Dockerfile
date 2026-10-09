@@ -4,6 +4,10 @@
 FROM maven:3.8.7-eclipse-temurin-11 AS build
 WORKDIR /build
 
+# Общий модуль kafka-config ставится в локальный репозиторий Maven внутри образа
+COPY kafka-config ./kafka-config
+RUN --mount=type=cache,target=/root/.m2,sharing=locked mvn -B -q -f kafka-config/pom.xml install
+
 # Сначала только pom.xml: слой с зависимостями кешируется и не перекачивается,
 # пока не изменился pom (правки в src его не инвалидируют)
 COPY pom.xml .

@@ -1,4 +1,9 @@
-# В контекст сборки book-service попадают только pom.xml и src
+# Общий контекст сборки (корень репозитория) для book-service и rating-service:
+# в него попадают только исходники сервисов и общего модуля kafka-config
 *
 !pom.xml
 !src
+!kafka-config/pom.xml
+!kafka-config/src
+!rating-service/pom.xml
+!rating-service/src

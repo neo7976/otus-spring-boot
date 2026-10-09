@@ -3,6 +3,7 @@ package ru.dsobin.otus.spring.boot.controller;
 import com.sun.istack.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,6 +56,17 @@ public class BookController {
             @AuthenticationPrincipal UserDetails user) {
         RatingSummaryDto rating = bookRatingService.rate(id, user.getUsername(), dto.getScore());
         return ResponseEntity.ok(ResultUtil.createSuccess(rating));
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PostMapping(value = "/{id}/rating/async", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResultDto<Void>> rateBookAsync(
+            @PathVariable("id") Long id,
+            @RequestBody RateBookDto dto,
+            @AuthenticationPrincipal UserDetails user) {
+        bookRatingService.rateAsync(id, user.getUsername(), dto.getScore());
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(new ResultDto<>(true, "Оценка принята в обработку", null));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")

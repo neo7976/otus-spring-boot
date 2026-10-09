@@ -24,3 +24,8 @@ spring:
 logging:
   file:
     name: target/logs/otus-spring-boot-test.log
+
+kafka:
+  topic:
+    # Без брокера KafkaAdmin ждал бы его при старте каждого тестового контекста
+    auto-create: false

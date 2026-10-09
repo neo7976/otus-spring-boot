@@ -4,10 +4,14 @@
 FROM maven:3.8.7-eclipse-temurin-11 AS build
 WORKDIR /build
 
-COPY pom.xml .
+# Контекст сборки — корень репозитория (нужен общий модуль kafka-config)
+COPY kafka-config ./kafka-config
+RUN --mount=type=cache,target=/root/.m2,sharing=locked mvn -B -q -f kafka-config/pom.xml install
+
+COPY rating-service/pom.xml .
 RUN --mount=type=cache,target=/root/.m2,sharing=locked mvn -B -q dependency:go-offline
 
-COPY src ./src
+COPY rating-service/src ./src
 RUN --mount=type=cache,target=/root/.m2,sharing=locked mvn -B -q package -DskipTests \
     && cp target/*.jar app.jar \
     && java -Djarmode=layertools -jar app.jar extract --destination extracted
