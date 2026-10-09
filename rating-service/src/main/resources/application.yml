@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: rating-service
+  datasource:
+    url: jdbc:h2:mem:ratingdb
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+
+server:
+  port: 9100
+
+kafka:
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  topic:
+    book-ratings: book-ratings
+  consumer:
+    book-ratings-group-id: rating-service
+    auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
