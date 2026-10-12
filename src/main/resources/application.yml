@@ -34,7 +34,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,logfile
+        include: health,info,metrics,loggers,logfile,circuitbreakers,circuitbreakerevents
+  health:
+    # Состояние circuit breaker'ов в /actuator/health (компонент circuitBreakers)
+    circuitbreakers:
+      enabled: true
   endpoint:
     health:
       # Детали (БД, диск, каталог книг) видит только администратор
@@ -73,6 +77,19 @@ resilience4j:
         minimum-number-of-calls: 5
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 2
+        # Медленные вызовы тоже считаются сбоем
+        slow-call-duration-threshold: 2s
+        slow-call-rate-threshold: 50
+        register-health-indicator: true
+        # Разомкнутый breaker виден в health, но не роняет общий статус приложения в DOWN:
+        # сервис продолжает работать на fallback'ах, и Docker не должен считать его unhealthy
+        allow-health-indicator-to-fail: false
+    instances:
+      # Публикация оценок в Kafka (BookRatingEventProducer.send)
+      kafkaProducer:
+        base-config: default
+        slow-call-duration-threshold: 3s
 
 kafka:
   bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -82,8 +99,8 @@ kafka:
     acks: all
     retries: 3
     properties:
-      max.block.ms: 5000
-      request.timeout.ms: 5000
+      max.block.ms: 3000
+      request.timeout.ms: 3000
       delivery.timeout.ms: 10000
 
 jwt:

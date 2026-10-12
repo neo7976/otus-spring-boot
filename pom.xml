@@ -88,6 +88,17 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
 		</dependency>
+		<!-- Аннотации @CircuitBreaker/@Retry (Javanica-стиль) и интеграция с Actuator.
+		     Версия совпадает с той, что тянет Spring Cloud 2020.0.x -->
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+			<version>1.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
 
 		<!-- Асинхронное взаимодействие с rating-service через Kafka (общий модуль ../kafka-config) -->
 		<dependency>

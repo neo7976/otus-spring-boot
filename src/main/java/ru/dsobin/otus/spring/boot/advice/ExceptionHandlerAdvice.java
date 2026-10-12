@@ -2,7 +2,6 @@ package ru.dsobin.otus.spring.boot.advice;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.KafkaException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.dsobin.otus.spring.boot.client.rating.RatingServiceUnavailableException;
 import ru.dsobin.otus.spring.boot.dto.result.ResultDto;
 import ru.dsobin.otus.spring.boot.dto.result.ResultStatusDto;
+import ru.dsobin.otus.spring.boot.kafka.MessageBrokerUnavailableException;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -22,10 +22,10 @@ public class ExceptionHandlerAdvice {
                 .body(new ResultDto<>(false, e.getMessage(), null));
     }
 
-    @ExceptionHandler(KafkaException.class)
-    public ResponseEntity<ResultStatusDto> kafkaExceptionHandler(KafkaException e) {
+    @ExceptionHandler(MessageBrokerUnavailableException.class)
+    public ResponseEntity<ResultStatusDto> messageBrokerUnavailableHandler(MessageBrokerUnavailableException e) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(new ResultDto<>(false, "Брокер сообщений недоступен, повторите позже", null));
+                .body(new ResultDto<>(false, e.getMessage(), null));
     }
 
     @ExceptionHandler(RatingServiceUnavailableException.class)
